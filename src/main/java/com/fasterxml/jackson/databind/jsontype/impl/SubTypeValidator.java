@@ -68,6 +68,9 @@ public class SubTypeValidator
         s.add("oracle.jdbc.connector.OracleManagedConnectionFactory");
         s.add("oracle.jdbc.rowset.OracleJDBCRowSet");
 
+        // CVE-2018-14721 block "axis2-jaxws" class from polymorphic deserialization
+        s.add("org.apache.axis2.jaxws.spi.handler.HandlerResolverImpl");
+
         DEFAULT_NO_DESER_CLASS_NAMES = Collections.unmodifiableSet(s);
     }
 

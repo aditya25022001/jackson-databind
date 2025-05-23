@@ -116,6 +116,32 @@ public class IllegalTypesCheckTest extends BaseMapTest
         _testIllegalType(ComboPooledDataSource.class); // [databind#1931]
     }
 
+    // [databind#2097]   [CVE-2018-14721]
+    public void testAxis2Jawsx() throws Exception
+    {
+        final String clsName = "org.apache.axis2.jaxws.spi.handler.HandlerResolverImpl";
+        final String json = aposToQuotes(
+                "{'id': 124,\n" +
+                        " 'obj':[ '" + clsName + "',\n" +
+                        "  {\n" +
+                        "    'handlerResolver': null,\n" +
+                        "    'handlerChains': []\n" +
+                        "  }\n" +
+                        " ]\n" +
+                        "}"
+        );
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enableDefaultTyping();
+
+        try {
+            mapper.readValue(json, Bean1599.class);
+            fail("Deserialization should have been blocked for: " + clsName);
+        } catch (JsonMappingException e) {
+            _verifySecurityException(e, clsName);
+        }
+    }
+
     private void _testIllegalType(Class<?> nasty) throws Exception {
         _testIllegalType(nasty.getName());
     }
